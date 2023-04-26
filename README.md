@@ -3,9 +3,9 @@
 These are the simulated turtlebot navigation environments used in [1]. Three environments as shown
 below are provided, with increasing size and complexity.
 
-<img alt="3x3 world" src="doc/img/3x3_env.png" height="200px"/>
-<img alt="4x4 world" src="doc/img/4x4_env.png" height="200px"/>
-<img alt="5x5 world" src="doc/img/5x5_env.png" height="200px"/>
+<img alt="3x3 world" src="doc/img/3x3_env.png" height="150px"/>
+<img alt="4x4 world" src="doc/img/4x4_env.png" height="150px"/>
+<img alt="5x5 world" src="doc/img/5x5_env.png" height="150px"/>
 
 ## Installation
 Install the dependencies via
