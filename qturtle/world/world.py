@@ -1,7 +1,9 @@
 from copy import deepcopy
 import itertools
 import random
+import numpy as np
 
+from .dyn_object import DynamicObject
 from .parts import Walls, draw_goal
 from .objects import create_object
 
@@ -45,6 +47,26 @@ class World:
 
         return [*sample[0], self.BASE_Z], sample[1]
 
+    def dist_angle_from_goal(self, pos_orientation):
+        pos = np.array(pos_orientation[0:2])
+        rho = pos_orientation[2]
+
+        direction = np.array([np.cos(rho), np.sin(rho)])
+        goal = np.array(self.goal)
+
+        dist = np.linalg.norm(goal - pos)
+        angle = np.arccos(np.dot(direction, goal-pos)/dist)
+
+        return dist, angle
+
+    def reset(self):
+        if self.multi_goal:
+            self._sample_goal()
+
+    def update_dynamic_objects(self):
+        for do in self.dyn_objects:
+            do.update(self.sim)
+
     def _build(self):
         self.walls = Walls(self.x_size, self.y_size, sim=self.sim)
         self.objects = [
@@ -53,10 +75,21 @@ class World:
             in self.config["objects"]
         ]
 
+        dyn_objects = self.config.get("dyn_objects", [])
+
+        self.dyn_objects = [
+            DynamicObject(obj_type, obj_kwargs, sim=self.sim, **general_kwargs, **dyn_kwargs)
+            for (obj_type, general_kwargs, obj_kwargs, dyn_kwargs)
+            in dyn_objects
+        ]
+
         self.goal_obj = draw_goal(*self.goal, sim=self.sim)
 
         self.collision_objects.extend(self.objects)
         self.collision_objects.extend(self.walls.objects)
+
+        for do in self.dyn_objects:
+            self.collision_objects.append(do.object)
 
     def _parse_config(self):
         self.repr = self.config["repr"]
@@ -67,9 +100,18 @@ class World:
         self.y_size = setup["y_size"]
         self.start_pos = [*setup["start"][0], self.BASE_Z]
         self.start_angle = setup["start"][1]
-        self.goal = setup["goal"]
         self.resets = setup.get("resets", [])
         self.resets.append(setup["start"])
+
+        self.multi_goal = setup.get("multi_goal", False)
+        if self.multi_goal:
+            self.goals = setup["goals"]
+            self._sample_goal()
+        else:
+            self.goal = setup["goal"]
+
+    def _sample_goal(self):
+        self.goal = random.choice(self.goals)
 
 
 class MiniWorld(World):

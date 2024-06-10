@@ -90,6 +90,9 @@ class GymEnvironment(gym.Env):
         Any
             The starting state of the robot
         """
+        self.world.reset()
+        self.termination.reset(self.world.goal)
+
         if random:
             pos, angle = self.world.sample_start()
             self.turtlebot.reset(pos, angle)
@@ -97,7 +100,7 @@ class GymEnvironment(gym.Env):
             self.turtlebot.reset()
 
         self._run_sim_steps(self.sim_steps)
-        self.reward.reset()
+        self.reward.reset(self.world.goal)
         self.steps = 0
 
         return  [list(self.turtlebot.get_pos_and_orientation())]

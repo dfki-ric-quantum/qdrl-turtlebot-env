@@ -1,10 +1,17 @@
 from ..control import StepControl
 from ..env.gym import GymEnvironment
+from ..env.lidar_gym import LidarGymEnvironment
 from ..reward import DistanceDecreaseReward
+from ..sensors.lidar import Lidar
 from ..sim import setup_pybullet
 from ..termination import GoalThreshold
 from ..turtlebot import Turtlebot
-from ..world.configs import LARGE_WORLD_V0, MEDI_WORLD_V0, MINI_S_CURVE
+from ..world.configs import (
+    LARGE_WORLD_V0,
+    LIDAR_DYN_COMP,
+    MEDI_WORLD_V0,
+    MINI_S_CURVE,
+)
 from ..world.world import World
 
 # Velocities for going forward, right and left (left wheel, right wheel, sim steps)
@@ -17,6 +24,8 @@ STEPPING = [
 # Basic configuration
 CONFIG = {"dt": 1.0 / 100.0, "sim_steps": 50, "base_speed": 10.0, "goal_threshold": 0.4}
 
+N_LIDAR_RAYS = 10
+
 
 class DefaultBuilder:
     """Builder class for the default environment"""
@@ -24,7 +33,6 @@ class DefaultBuilder:
     def __init__(
         self, gui, dt, sim_steps, world_config, base_speed, stepping, goal_threshold
     ):
-
         """The constructor
 
         Parameters
@@ -54,7 +62,7 @@ class DefaultBuilder:
         self.goal_threshold = goal_threshold
 
     def _build_base_objects(self):
-        """ Build basic environment components """
+        """Build basic environment components"""
 
         self.world = World(self.world_config, self.sim)
         self.turtlebot = Turtlebot(
@@ -75,12 +83,11 @@ class DefaultBuilder:
         )
 
     def _build_control(self):
-        """ Build control scheme based on stepping configuration """
+        """Build control scheme based on stepping configuration"""
         self.control = StepControl(base_speed=self.base_speed, steps=self.stepping)
 
     def get(self):
-
-        """Build and return the enfironment
+        """Build and return the environment
 
         Returns
         -------
@@ -101,6 +108,34 @@ class DefaultBuilder:
         )
 
 
+class LidarEnvBuilder(DefaultBuilder):
+    def _build_base_objects(self):
+        super()._build_base_objects()
+        self.lidar = Lidar(N_LIDAR_RAYS, gui=self.gui)
+
+    def get(self):
+        """Build and return the environment
+
+        Returns
+        -------
+        LidarGymEnvironment
+            The environment
+        """
+        self._build_base_objects()
+        self._build_control()
+
+        return LidarGymEnvironment(
+            sim=self.sim,
+            sim_steps=self.sim_steps,
+            turtlebot=self.turtlebot,
+            world=self.world,
+            control=self.control,
+            reward=self.reward,
+            termination=self.termination,
+            lidar=self.lidar
+        )
+
+
 def default_builder(world, gui=False):
     """Builder function called from qturtle.make()
 
@@ -116,9 +151,25 @@ def default_builder(world, gui=False):
     GymEnvironment
         The environment
     """
-    world_configs = {"3x3": MINI_S_CURVE, "4x4": MEDI_WORLD_V0, "5x5": LARGE_WORLD_V0}
+    world_configs = {
+        "3x3": MINI_S_CURVE,
+        "4x4": MEDI_WORLD_V0,
+        "5x5": LARGE_WORLD_V0,
+    }
 
     builder = DefaultBuilder(
+        gui=gui, world_config=world_configs[world], stepping=STEPPING, **CONFIG
+    )
+
+    return builder.get()
+
+
+def lidar_env_builder(world, gui=False):
+    world_configs = {
+        "LDC": LIDAR_DYN_COMP,
+    }
+
+    builder = LidarEnvBuilder(
         gui=gui, world_config=world_configs[world], stepping=STEPPING, **CONFIG
     )
 

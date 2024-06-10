@@ -41,3 +41,9 @@ class GoalThreshold:
         pos = np.array([state[0][0], state[0][1]])
 
         return np.linalg.norm(self.goal - pos) <= self.threshold
+
+    def reset(self, goal=None):
+        """Reset goal"""
+
+        if goal:
+            self.goal = np.array(goal)

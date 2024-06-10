@@ -93,7 +93,7 @@ class DistanceDecreaseReward(BaseGoalReward):
                          collision_reward=collision_reward,
                          step_reward=step_reward)
 
-        self.reset()
+        self.reset(goal)
 
     def __call__(self, state, collision):
         """Get the reward
@@ -121,5 +121,6 @@ class DistanceDecreaseReward(BaseGoalReward):
         self.dist = dist
         return reward
 
-    def reset(self):
+    def reset(self, goal):
+        self.goal = np.array(goal)
         self.dist = np.linalg.norm(self.goal - self.start)

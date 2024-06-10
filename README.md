@@ -1,21 +1,21 @@
 # QTurtle environment
 
-These are the simulated turtlebot navigation environments used in [1]. Three environments as shown
-below are provided, with increasing size and complexity.
+These are the simulated turtlebot navigation environments used in [1]:
 
 <img alt="3x3 world" src="doc/img/3x3_env.png" height="150px"/>
 <img alt="4x4 world" src="doc/img/4x4_env.png" height="150px"/>
 <img alt="5x5 world" src="doc/img/5x5_env.png" height="150px"/>
+<img alt="dynamic world" src="doc/img/dynamic.png" height="150px"/>
 
 ## Installation
-Install the dependencies via
+Install via:
 
 ```
-pip install -r requirements.txt
+pip install -e .
 ```
 
-and make this repository available in your python path, either by adjusting `sys.path`
-programmatically or by adding it to the `PYTHONPATH` environment variable.
+from this folder.
+
 
 ## Usage
 The environment follows the OpenAI gym API, basic usage is documented `example_run.py`. To test the
@@ -25,8 +25,9 @@ environment, run:
 ipython example_run.py -- -w 3x3
 ```
 
-or `4x4` or `5x5` for the two larger worlds, which will load the environment and robot in its
-starting position and launch an ipython shell that lets you interact with both.
+or `4x4` or `5x5` for the two larger static worlds or `LDC` for the dynamic environment, which will
+load the environment and robot in its starting position and launch an ipython shell that lets you
+interact with both.
 
 ## License
 Licensed under the BSD 3-clause license, see `LICENSE` for details.

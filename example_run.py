@@ -38,7 +38,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Test default env")
     parser.add_argument(
-        "-w", type=str, required=True, dest="world", choices=["3x3", "4x4", "5x5"]
+        "-w", type=str, required=True, dest="world", choices=["3x3", "4x4", "5x5", "LDC"]
     )
 
     return parser.parse_args()
@@ -126,6 +126,7 @@ if __name__ == "__main__":
         "3x3": ("DEFAULT_3x3_V0", T_SMALL),
         "4x4": ("DEFAULT_4x4_V0", T_MEDI),
         "5x5": ("DEFAULT_5x5_V0", T_LARGE),
+        "LDC": ("LIDAR_LDC_V0", []),
     }
 
     args = parse_args()

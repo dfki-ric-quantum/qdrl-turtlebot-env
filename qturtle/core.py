@@ -1,4 +1,4 @@
-from .builders import default_builder
+from .builders import default_builder, lidar_env_builder
 
 
 def make(env, **kwargs):
@@ -19,11 +19,14 @@ def make(env, **kwargs):
     world = tokens[1]
     # version = tokens[2]
 
+    builder_kwargs = {
+        "world": world
+    }
+
     if key == 'DEFAULT':
-        builder_kwargs = {
-            "world": world
-        }
         builder = default_builder
+    elif key == 'LIDAR':
+        builder = lidar_env_builder
     else:
         raise ValueError(f"{env} has no builder function specified")
 
